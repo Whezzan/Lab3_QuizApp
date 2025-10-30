@@ -5,8 +5,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lab3_QuizApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="QuizOrganizer" Height="450" Width="800">
 
-    </Grid>
+    <DockPanel>
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File" />
+            <MenuItem Header="_Edit" />
+            <MenuItem Header="_View" />
+        </Menu>
+
+        <!-- Main Content -->
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header: PackName + Buttons -->
+            <DockPanel Grid.Row="0" LastChildFill="False" Grid.ColumnSpan="2">
+                <TextBlock Text="PackName" 
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           DockPanel.Dock="Left"/>
+
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Button Content="⚙" Width="25" Height="25" Margin="2"/>
+                    <Button Content="+" Width="25" Height="25" Margin="2"/>
+                    <Button Content="−" Width="25" Height="25" Margin="2"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Main List Area -->
+            <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Margin="0,5,0,0" Grid.ColumnSpan="2">
+                <ListBox />
+            </Border>
+        </Grid>
+    </DockPanel>
 </Window>
