@@ -1,70 +1,49 @@
 ﻿using Lab3_QuizApp.Models;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Lab3_QuizApp.ViewModels
 {
     internal class QuestionPackViewModel : ViewModelBase
     {
-        private readonly QuestionPack _model;
-
-        public QuestionPackViewModel(QuestionPack model)
-        {
-            _model = model;
-            Questions = new ObservableCollection<Question>(_model.Questions);
-            Questions.CollectionChanged += Questions_CollectionChanged;
-        }
-
-        private void Questions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
-                foreach (Question q in e.NewItems) _model.Questions.Add(q);
-
-            if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
-                foreach (Question q in e.OldItems) _model.Questions.Remove(q);
-
-            if (e.Action == NotifyCollectionChangedAction.Replace && e.OldItems != null && e.NewItems != null)
-                _model.Questions[e.OldStartingIndex] = (Question)e.NewItems[0]!;
-
-            if (e.Action == NotifyCollectionChangedAction.Reset)
-                _model.Questions.Clear();
-        }
+        private readonly QuestionPack model;
 
         public string Name
         {
-            get => _model.Name;
+            get => model.Name;
             set
             {
-                _model.Name = value;
+                model.Name = value;
                 RaisePropertyChanged();
             }
         }
 
         public Difficulty Difficulty
         {
-            get => _model.Difficulty;
+            get => model.Difficulty;
             set
             {
-                _model.Difficulty = value;
+                model.Difficulty = value;
                 RaisePropertyChanged();
             }
         }
 
         public int TimeLimitInSeconds
         {
-            get => _model.TimeLimitInSeconds;
+            get => model.TimeLimitInSeconds;
             set
             {
-                _model.TimeLimitInSeconds = value;
+                model.TimeLimitInSeconds = value;
                 RaisePropertyChanged();
             }
         }
 
-        public ObservableCollection<Question> Questions { get; set; }
+        public ObservableCollection<Question> Questions { get; }
+
+        public QuestionPackViewModel(QuestionPack model)
+        {
+            this.model = model;
+            this.Questions = new ObservableCollection<Question>(model.Questions);
+        }
     }
 }
