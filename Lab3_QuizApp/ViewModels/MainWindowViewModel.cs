@@ -5,6 +5,8 @@ using System.IO;
 using System.Text.Json;
 using System.Net;
 using Path = System.IO.Path;
+using System.Net.Http;
+using System.Windows;
 
 namespace Lab3_QuizApp.ViewModels
 {
@@ -100,6 +102,7 @@ namespace Lab3_QuizApp.ViewModels
         public DelegateCommand SaveOnShortcutCommand { get; }
         public DelegateCommand SelectActivePackCommand { get; }
         public DelegateCommand ToggleWindowFullScreenCommand { get; }
+        public DelegateCommand OpenImportQuestionsCommand { get; }
 
 
         public MainWindowViewModel()
@@ -124,8 +127,7 @@ namespace Lab3_QuizApp.ViewModels
             SelectActivePackCommand = new DelegateCommand(SelectActivePack);
             ToggleWindowFullScreenCommand = new DelegateCommand(ToggleWindowFullScreen);
             ExitGameCommand = new DelegateCommand(ExitGame);
-
-            LoadTriviaQuestionsAsync();
+            OpenImportQuestionsCommand = new DelegateCommand(async _ => await ImportQuestionsAsync());
 
         }
 
@@ -245,18 +247,57 @@ namespace Lab3_QuizApp.ViewModels
             }
         }
 
-        public async Task LoadTriviaQuestionsAsync()
+        private async Task ImportQuestionsAsync()
         {
-            var service = new TriviaApiServices();
-            var questions = await service.GetQuestionsAsync(5);
-
-            // Bekräftelse (du kan ta bort sen)
-            Console.WriteLine($"✅ Hämtade {questions.Count} frågor från API!");
-
-            // Test: skriv ut frågorna i Output-fönstret
-            foreach (var q in questions)
+            try
             {
-                Console.WriteLine(WebUtility.HtmlDecode(q.question));
+                // Visa dialog
+                var dialog = new Views.ImportDialog();
+                bool? result = dialog.ShowDialog();
+                if (result != true) return; // avbröt användaren
+
+                int amount = dialog.Amount;
+                string category = dialog.Category;
+                string difficulty = dialog.Difficulty;
+
+                // API-anrop
+                var service = new OpenTriviaService();
+                var questions = await service.GetQuestionsAsync(amount, category, difficulty);
+
+                if (!questions.Any())
+                {
+                    MessageBox.Show("Inga frågor hittades.", "Import", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Skapa nytt pack
+                var importedPack = new QuestionPackViewModel(new QuestionPack("Imported Trivia Pack"));
+
+                foreach (var q in questions)
+                {
+                    importedPack.Questions.Add(new Question(
+                        System.Net.WebUtility.HtmlDecode(q.question),
+                        System.Net.WebUtility.HtmlDecode(q.correct_answer),
+                        (q.incorrect_answers ?? new List<string>())
+                            .Select(a => System.Net.WebUtility.HtmlDecode(a))
+                            .ToArray()
+                    ));
+                }
+
+                Packs.Add(importedPack);
+                ActivePack = importedPack;
+
+                await SaveToJsonAsync();
+
+                MessageBox.Show($"✅ {questions.Count} frågor importerade!", "Import", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"Fel vid API-anrop: {ex.Message}", "Import Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ett oväntat fel inträffade: {ex.Message}", "Import Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
