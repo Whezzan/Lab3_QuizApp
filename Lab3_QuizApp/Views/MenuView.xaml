@@ -36,6 +36,7 @@
 
             <MenuItem Header="_Import Questions"
                       Icon="{fa:Icon CloudArrowDown}"
+                      Command="{Binding OpenImportQuestionsCommand}"
                       InputGestureText="Ctrl+I"/>
             <Separator/>
 

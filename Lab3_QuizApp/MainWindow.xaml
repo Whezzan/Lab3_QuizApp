@@ -36,6 +36,9 @@
         <KeyBinding Key="S"
                     Modifiers="Ctrl"
                     Command="{Binding SaveOnShortcutCommand}"/>
+        <KeyBinding Key="I" 
+                    Modifiers="Ctrl" 
+                    Command="{Binding OpenImportQuestionsCommand}" />
     </Window.InputBindings>
 
     <Grid Background="MintCream">

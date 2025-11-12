@@ -3,6 +3,7 @@ using Lab3_QuizApp.Models;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
+using System.Net;
 using Path = System.IO.Path;
 
 namespace Lab3_QuizApp.ViewModels
@@ -123,6 +124,9 @@ namespace Lab3_QuizApp.ViewModels
             SelectActivePackCommand = new DelegateCommand(SelectActivePack);
             ToggleWindowFullScreenCommand = new DelegateCommand(ToggleWindowFullScreen);
             ExitGameCommand = new DelegateCommand(ExitGame);
+
+            LoadTriviaQuestionsAsync();
+
         }
 
         private void OpenPackDialog(object? obj)
@@ -241,7 +245,23 @@ namespace Lab3_QuizApp.ViewModels
             }
         }
 
+        public async Task LoadTriviaQuestionsAsync()
+        {
+            var service = new TriviaApiServices();
+            var questions = await service.GetQuestionsAsync(5);
+
+            // Bekräftelse (du kan ta bort sen)
+            Console.WriteLine($"✅ Hämtade {questions.Count} frågor från API!");
+
+            // Test: skriv ut frågorna i Output-fönstret
+            foreach (var q in questions)
+            {
+                Console.WriteLine(WebUtility.HtmlDecode(q.question));
+            }
+        }
+
         private void SaveOnShortcut(object? obj) => SaveToJsonAsync();
+
 
     }
 }
